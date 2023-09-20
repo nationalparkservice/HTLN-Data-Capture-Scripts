@@ -2,7 +2,7 @@
 
 library(tidyverse)
 
-setwd("../HTLN-Wetlands-Survey123/src")
+#setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
 
 load_file <- read_csv("Woody.csv")
 
@@ -21,37 +21,22 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
-# Substitute NA with -9999 in all dbl variable
 
-Access_data$ShrubClump <- Access_data$ShrubClump |> replace_na(-9999)
-Access_data$D0to1 <- Access_data$D0to1 |> replace_na(-9999)
-Access_data$D1to2_5 <- Access_data$D1to2_5 |> replace_na(-9999)
-Access_data$D2_5to5 <- Access_data$D2_5to5 |> replace_na(-9999)
-Access_data$D5to10 <- Access_data$D5to10 |> replace_na(-9999)
-Access_data$D10to15 <- Access_data$D15to20 |> replace_na(-9999)
-Access_data$D15to20 <- Access_data$D15to20 |> replace_na(-9999)
-Access_data$D20to25 <- Access_data$D20to25 |> replace_na(-9999)
-Access_data$D25to30 <- Access_data$D25to30 |> replace_na(-9999)
-Access_data$D30to35 <- Access_data$D30to35 |> replace_na(-9999)
-Access_data$D35to40 <- Access_data$D35to40 |> replace_na(-9999)
-Access_data$Dgt40 <- Access_data$Dgt40 |> replace_na(-9999)
 
-glimpse(Access_data)
+# Rename columns using DiamID values for pivot_longer
 
-# Rename columns using DiamID values
-
-Access_data$C0 <- Access_data$ShrubClump 
-Access_data$C1 <- Access_data$D0to1 
-Access_data$C2 <- Access_data$D1to2_5 
-Access_data$C3 <- Access_data$D2_5to5 
-Access_data$C4 <- Access_data$D5to10 
-Access_data$C5 <- Access_data$D15to20 
-Access_data$C6 <- Access_data$D15to20 
-Access_data$C7 <- Access_data$D20to25 
-Access_data$C8 <- Access_data$D25to30 
-Access_data$C9 <- Access_data$D30to35 
-Access_data$C10 <- Access_data$D35to40 
-Access_data$BIG <- Access_data$Dgt40 
+Access_data$Col1 <- Access_data$ShrubClump 
+Access_data$Col2<- Access_data$D0to1 
+Access_data$Col3 <- Access_data$D1to2_5 
+Access_data$Col4 <- Access_data$D2_5to5 
+Access_data$Col5 <- Access_data$D5to10 
+Access_data$Col6 <- Access_data$D15to20 
+Access_data$Col7 <- Access_data$D15to20 
+Access_data$Col8 <- Access_data$D20to25 
+Access_data$Col9 <- Access_data$D25to30 
+Access_data$Col10 <- Access_data$D30to35 
+Access_data$Col11 <- Access_data$D35to40 
+Access_data$Col12 <- Access_data$Dgt40 
 
 glimpse(Access_data)
 
@@ -81,32 +66,74 @@ glimpse(Access_data)
 
 Access_data <- Access_data |>
 	select(EventID, LocationID, FeatureID, WoodyModule, WoodySpecies, 
-	       EditDate, WoodySiteName, ShrubClump, C0, 
-	       C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, BIG)
+	       EditDate, WoodySiteName, Col1, Col2, Col3, Col4, Col5,
+	       Col6, Col7, Col8, Col9, Col10, Col11, Col12)
 
 glimpse(Access_data)
 
 
-###########################################################################
-#Access_data <- Access_data |> 
-#	  pivot_longer( cols = starts_with("C0"),
-#			       names_to = "DiamID", 
-#			       values_to = "Count")
-#billboard %>%
-#	  pivot_longer(
-#		           cols = starts_with("wk"),
-#			       names_to = "week",
-#			       names_prefix = "wk",
-#			           values_to = "rank",
-#			           values_drop_na = TRUE
-#				     )
-#
-#glimpse(Access_data)
-#
-#write_csv(Access_data, Access_data$Outfile[1])
+# pivot longer (normalize)
+
+Access_data <- Access_data |> 
+	  pivot_longer( 
+	           cols = starts_with("Col"),
+			       names_to = "DiamID",
+			         values_to = "Count",
+			         values_drop_na = TRUE
+			       )
+
+glimpse(Access_data)
+
+
+# Join the diameter information from a LUT
+
+Diam_LUT <- read_csv("Diam_LUT.csv")
+
+glimpse(Diam_LUT)
+
+Access_data <- Access_data |>
+  left_join(Diam_LUT, join_by(DiamID))
+
+view(Access_data)
+
+# Need an end-to-end test after all the column manipulations
+# Sum of counts in initial load file
+
+Initial_load <- load_file |>
+  select(ShrubClump, D0to1,
+         D1to2_5, D2_5to5, D5to10, D10to15, D15to20, D20to25, D25to30, D30to35,
+         D35to40, Dgt40)
+
+Initial_load
+
+colSums(Initial_load, na.rm=TRUE)
+
+# Sum of counts in tidy data
+
+view(Access_data)
+
+Access_data
+
+
+
 
 #writexl::write_xlsx(Access_data, "Load_VIBI_herb.xlsx")
   
 
+# Substitute NA with -9999 in all dbl variable
 
+Access_data$ShrubClump <- Access_data$ShrubClump |> replace_na(-9999)
+Access_data$D0to1 <- Access_data$D0to1 |> replace_na(-9999)
+Access_data$D1to2_5 <- Access_data$D1to2_5 |> replace_na(-9999)
+Access_data$D2_5to5 <- Access_data$D2_5to5 |> replace_na(-9999)
+Access_data$D5to10 <- Access_data$D5to10 |> replace_na(-9999)
+Access_data$D10to15 <- Access_data$D15to20 |> replace_na(-9999)
+Access_data$D15to20 <- Access_data$D15to20 |> replace_na(-9999)
+Access_data$D20to25 <- Access_data$D20to25 |> replace_na(-9999)
+Access_data$D25to30 <- Access_data$D25to30 |> replace_na(-9999)
+Access_data$D30to35 <- Access_data$D30to35 |> replace_na(-9999)
+Access_data$D35to40 <- Access_data$D35to40 |> replace_na(-9999)
+Access_data$Dgt40 <- Access_data$Dgt40 |> replace_na(-9999)
+
+glimpse(Access_data)
 
