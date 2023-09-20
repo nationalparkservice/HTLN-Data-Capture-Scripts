@@ -1,6 +1,6 @@
 # HTLN-Data-Capture-Scripts
 
-Migrating data from Survey123 and other field loggers into MS Access and other relational databases.
+Data workflows from Survey123 and other field loggers into MS Access and other relational databases.
 
 # Notes
 
@@ -8,8 +8,9 @@ Migrating data from Survey123 and other field loggers into MS Access and other r
 
 Set up and moving ongoing wetlands survey 123 project to this repo. Repo layout is
 
-./<protocol>/src  dev folder
-./R               executable scripts
+./protocol_name/src                dev folder
+
+./protocol_name/R                  executable scripts
 
 
 
