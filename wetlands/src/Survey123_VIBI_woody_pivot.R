@@ -17,7 +17,8 @@ Access_data <- load_file |>
 
 Access_data <- Access_data |>
   mutate( FeatureID = WoodySiteName) |>
-  mutate(EditDate = (EditDate <- as.Date(EditDate, format = "%m/%d/%Y")))
+  mutate(EditDate = (EditDate <- as.Date(EditDate, format = "%m/%d/%Y"))) |>
+  mutate( Module_No = WoodyModule ) 
 
 glimpse(Access_data)
 
@@ -30,7 +31,7 @@ Access_data$Col2<- Access_data$D0to1
 Access_data$Col3 <- Access_data$D1to2_5 
 Access_data$Col4 <- Access_data$D2_5to5 
 Access_data$Col5 <- Access_data$D5to10 
-Access_data$Col6 <- Access_data$D15to20 
+Access_data$Col6 <- Access_data$D10to15
 Access_data$Col7 <- Access_data$D15to20 
 Access_data$Col8 <- Access_data$D20to25 
 Access_data$Col9 <- Access_data$D25to30 
@@ -61,11 +62,21 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
+# create Scientific_Name column from WoodySpecies codes
+
+WoodySpecies_LUT <- read_csv("WoodySpecies_LUT.csv")
+
+glimpse(WoodySpecies_LUT)
+
+Access_data <- Access_data |>
+  left_join(WoodySpecies_LUT, join_by(WoodySpecies))
+
+glimpse(Access_data)
 
 # set up columns before normalization
 
 Access_data <- Access_data |>
-	select(EventID, LocationID, FeatureID, WoodyModule, WoodySpecies, 
+	select(EventID, LocationID, FeatureID, Module_No, Scientific_Name, 
 	       EditDate, WoodySiteName, Col1, Col2, Col3, Col4, Col5,
 	       Col6, Col7, Col8, Col9, Col10, Col11, Col12)
 
@@ -94,9 +105,7 @@ glimpse(Diam_LUT)
 Access_data <- Access_data |>
   left_join(Diam_LUT, join_by(DiamID))
 
-view(Access_data)
-
-# Need an end-to-end test after all the column manipulations
+# Need an end-to-end test after all the column manipulations -------------------
 # Sum of counts in initial load file
 
 Initial_load <- load_file |>
@@ -104,36 +113,32 @@ Initial_load <- load_file |>
          D1to2_5, D2_5to5, D5to10, D10to15, D15to20, D20to25, D25to30, D30to35,
          D35to40, Dgt40)
 
-Initial_load
+
 
 colSums(Initial_load, na.rm=TRUE)
 
-# Sum of counts in tidy data
 
-view(Access_data)
+Access_data |>
+  group_by(Diam_Desc) |> 
+  summarize(
+    total_count = sum(Count)
+  )
 
-Access_data
+#-------------------------------------------------------------------------------
 
-
-
-
-#writexl::write_xlsx(Access_data, "Load_VIBI_herb.xlsx")
+# Substitute NA with -9999 in Count data 
   
+glimpse(Access_data)
 
-# Substitute NA with -9999 in all dbl variable
+Access_data$Count <- Access_data$Count |> replace_na(-9999)
 
-Access_data$ShrubClump <- Access_data$ShrubClump |> replace_na(-9999)
-Access_data$D0to1 <- Access_data$D0to1 |> replace_na(-9999)
-Access_data$D1to2_5 <- Access_data$D1to2_5 |> replace_na(-9999)
-Access_data$D2_5to5 <- Access_data$D2_5to5 |> replace_na(-9999)
-Access_data$D5to10 <- Access_data$D5to10 |> replace_na(-9999)
-Access_data$D10to15 <- Access_data$D15to20 |> replace_na(-9999)
-Access_data$D15to20 <- Access_data$D15to20 |> replace_na(-9999)
-Access_data$D20to25 <- Access_data$D20to25 |> replace_na(-9999)
-Access_data$D25to30 <- Access_data$D25to30 |> replace_na(-9999)
-Access_data$D30to35 <- Access_data$D30to35 |> replace_na(-9999)
-Access_data$D35to40 <- Access_data$D35to40 |> replace_na(-9999)
-Access_data$Dgt40 <- Access_data$Dgt40 |> replace_na(-9999)
+
+
+Access_data <- Access_data |>
+  select( EventID, LocationID, FeatureID, Module_No, 
+          Scientific_Name, Diam_Code, Count
+  )
 
 glimpse(Access_data)
 
+writexl::write_xlsx(Access_data, "Load_VIBI_woody.xlsx")
