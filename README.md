@@ -4,6 +4,12 @@ Data workflows from Survey123 and other field loggers into MS Access and other r
 
 # Notes
 
+20231010
+
+BIG tree categories based on diameter classes. End-to-end to test BIG category counts
+
+
+
 20230925
 
 VIBI_woody end-to-end test following pivot_longer
