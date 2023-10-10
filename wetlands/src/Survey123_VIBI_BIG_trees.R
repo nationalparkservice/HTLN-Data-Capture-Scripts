@@ -1,5 +1,6 @@
 
 
+
 library(tidyverse)
 
 setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
@@ -9,11 +10,11 @@ load_file <- read_csv("Woody.csv")
 glimpse(load_file)
 
 # select columns for Access import
+# for big trees, need 40_1 onwards
 
 Access_data <- load_file |>
-	select(WoodyModule, WoodySpecies, EditDate, WoodySiteName, ShrubClump, D0to1,
-	       D1to2_5, D2_5to5, D5to10, D10to15, D15to20, D20to25, D25to30, D30to35,
-	       D35to40, Dgt40, Dgt40_1, Dgt40_2, Dgt40_3, Dgt40_4, Dgt40_5)
+	select(WoodyModule, WoodySpecies, EditDate, WoodySiteName, 
+	       Dgt40_1, Dgt40_2, Dgt40_3, Dgt40_4, Dgt40_5)
 
 Access_data <- Access_data |>
   mutate( FeatureID = WoodySiteName) |>
@@ -22,30 +23,27 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
-initial_test <- Access_data |>
-  select(ShrubClump, D0to1, D1to2_5, D2_5to5, 
-  D5to10, D10to15, D15to20, D20to25, D25to30, D30to35,
-  D35to40, Dgt40, Dgt40_1, Dgt40_2, Dgt40_3, Dgt40_4, Dgt40_5)
+################################################################################
+#   Each column past 40 represents an individual tree
+#   The value in the column represents the diameter
+#   Need to extract into what format??
+#   See tbl_BigTrees
+#
+# EventID LocationID ModNo Scientific_Name DBH
+#
+#
+# Still need EventID, Location_ID, and derive Scientific_Name from LUT 
 
-glimpse(initial_test)
-
-colSums(initial_test, na.rm=TRUE)
-
+# Start testing here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 # Rename columns using DiamID values for pivot_longer
 
-Access_data$Col1 <- Access_data$ShrubClump 
-Access_data$Col2<- Access_data$D0to1 
-Access_data$Col3 <- Access_data$D1to2_5 
-Access_data$Col4 <- Access_data$D2_5to5 
-Access_data$Col5 <- Access_data$D5to10 
-Access_data$Col6 <- Access_data$D10to15
-Access_data$Col7 <- Access_data$D15to20 
-Access_data$Col8 <- Access_data$D20to25 
-Access_data$Col9 <- Access_data$D25to30 
-Access_data$Col10 <- Access_data$D30to35 
-Access_data$Col11 <- Access_data$D35to40 
-Access_data$Col12 <- Access_data$Dgt40 
+Access_data$Col1 <- Access_data$Dgt40_1 
+Access_data$Col2 <- Access_data$Dgt40_2 
+Access_data$Col3 <- Access_data$Dgt40_3
+Access_data$Col4 <- Access_data$Dgt40_4 
+Access_data$Col5 <- Access_data$Dgt40_5
+
 
 glimpse(Access_data)
 
