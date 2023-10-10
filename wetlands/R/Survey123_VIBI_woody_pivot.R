@@ -2,7 +2,7 @@
 
 library(tidyverse)
 
-setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
+#setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
 
 load_file <- read_csv("Woody.csv")
 
@@ -22,14 +22,6 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
-initial_test <- Access_data |>
-  select(ShrubClump, D0to1, D1to2_5, D2_5to5, 
-  D5to10, D10to15, D15to20, D20to25, D25to30, D30to35,
-  D35to40, Dgt40, Dgt40_1, Dgt40_2, Dgt40_3, Dgt40_4, Dgt40_5)
-
-glimpse(initial_test)
-
-colSums(initial_test, na.rm=TRUE)
 
 
 # Rename columns using DiamID values for pivot_longer
@@ -113,15 +105,8 @@ glimpse(Diam_LUT)
 Access_data <- Access_data |>
   left_join(Diam_LUT, join_by(DiamID))
 
-# Need an end-to-end test after all the column manipulations ------------------- # Sum of counts in initial load file
-in the diameter information from a LUT
-
-Diam_LUT <- read_csv("Diam_LUT.csv")
-
-glimpse(Diam_LUT)
-
-Access_data <- Access_data |>
-	  left_join(Diam_LUT, join_by(DiamID))
+# Need an end-to-end test after all the column manipulations -------------------
+# Sum of counts in initial load file
 
 Initial_load <- load_file |>
   select(ShrubClump, D0to1,
