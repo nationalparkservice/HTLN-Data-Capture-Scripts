@@ -1,5 +1,10 @@
 
 
+##########
+#
+# Step 1 - Load data
+#
+##########
 
 library(tidyverse)
 
@@ -7,34 +12,84 @@ setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
 
 load_file <- read_csv("Woody.csv")
 
-glimpse(load_file)
+# glimpse(load_file)
 
-# select columns for Access import
+
+
+##########
+#
+# Step 2 - select columns for Access import
 # for big trees, need 40_1 onwards
+#
+##########
 
 Access_data <- load_file |>
 	select(WoodyModule, WoodySpecies, EditDate, WoodySiteName, 
 	       Dgt40_1, Dgt40_2, Dgt40_3, Dgt40_4, Dgt40_5)
+
+# glimpse(Access_data)
+
+
+
+##########
+#
+# Step 3 - create columns for FeatureID and Module_No
+#   and convert date format
+#
+##########
 
 Access_data <- Access_data |>
   mutate( FeatureID = WoodySiteName) |>
   mutate(EditDate = (EditDate <- as.Date(EditDate, format = "%m/%d/%Y"))) |>
   mutate( Module_No = WoodyModule ) 
 
+
+
+##########
+#
+# Step 4 - Generate EventID from EditDate
+#
+##########
+
+Access_data <- Access_data |>
+  mutate( EventID = str_c( 'CUVAWetlnd', EditDate)) |>
+  mutate(EventID = str_replace_all(EventID, "-", ""))
+
+# glimpse(Access_data)
+
+
+##########
+#
+# Step 5 - create the LocationID column from the FeatureID column
+#   and a lookup table from HTLNWetlands
+#
+##########
+
+Locations_LUT <- read_csv("Locations_LUT.csv")
+
+# glimpse(Locations_LUT)
+
+Access_data <- Access_data |>
+	  left_join(Locations_LUT, join_by(FeatureID))
+
+# glimpse(Access_data)
+
+##########
+#
+# Step 6 - create Scientific_Name column from WoodySpecies codes <<<<<<<<<<<<<< many-to-many warning here
+#  NEED TO RESOLVE SPECIES CODE DUPLICATES IN LUT - Start in MS Access SpeciesCodes.accdb
+#  
+##########
+
+WoodySpecies_LUT <- read_csv("WoodySpecies_LUT.csv")
+
+glimpse(WoodySpecies_LUT)
+
+Access_data <- Access_data |>
+	  left_join(WoodySpecies_LUT, join_by(WoodySpecies))
+
 glimpse(Access_data)
 
-################################################################################
-#   Each column past 40 represents an individual tree
-#   The value in the column represents the diameter
-#   Need to extract into what format??
-#   See tbl_BigTrees
-#
-# EventID LocationID ModNo Scientific_Name DBH
-#
-#
-# Still need EventID, Location_ID, and derive Scientific_Name from LUT 
-
-# Start testing here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 # Rename columns using DiamID values for pivot_longer
 
@@ -47,26 +102,6 @@ Access_data$Col5 <- Access_data$Dgt40_5
 
 glimpse(Access_data)
 
-# Generate EventID from EditDate
-
-Access_data <- Access_data |>
-	  mutate( EventID = str_c( 'CUVAWetlnd', EditDate)) |>
-	    mutate(EventID = str_replace_all(EventID, "-", ""))
-
-glimpse(Access_data)
-
-
-# create the LocationID column from the FeatureID column
-# and a lookup table from HTLNWetlands
-
-Locations_LUT <- read_csv("Locations_LUT.csv")
-
-glimpse(Locations_LUT)
-
-Access_data <- Access_data |>
-  left_join(Locations_LUT, join_by(FeatureID))
-
-glimpse(Access_data)
 
 # create Scientific_Name column from WoodySpecies codes
 
