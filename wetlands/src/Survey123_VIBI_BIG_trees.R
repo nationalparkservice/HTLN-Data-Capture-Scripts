@@ -1,4 +1,13 @@
 
+##########
+#
+# This script takes woody VIBI data from Survey123 and 
+#   transforms the BIG tree (> 40 cm DBH) portion to be
+#   loaded into the tbl_BigTree table in the HTLNWetlands
+#   database
+#
+##########
+
 
 ##########
 #
@@ -8,7 +17,7 @@
 
 library(tidyverse)
 
-setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
+# setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
 
 load_file <- read_csv("Woody.csv")
 
@@ -19,7 +28,7 @@ load_file <- read_csv("Woody.csv")
 ##########
 #
 # Step 2 - select columns for Access import
-# for big trees, need 40_1 onwards
+# for big trees, need columns 40_1 onwards
 #
 ##########
 
@@ -76,14 +85,25 @@ Access_data <- Access_data |>
 
 ##########
 #
-# Step 6 - create Scientific_Name column from WoodySpecies codes <<<<<<<<<<<<<< many-to-many warning here
-#  NEED TO RESOLVE SPECIES CODE DUPLICATES IN LUT - Start in MS Access SpeciesCodes.accdb
-#  
+# Step 6 - Load species look-up table and join to data. 
+#   WARNING - Many-to-many indicates multiple species
+#   for a given species code. Duplicate species need to 
+#   be resolved by project lead
+#   
 ##########
 
-WoodySpecies_LUT <- read_csv("WoodySpecies_LUT.csv")
+WoodySpecies_LUT <- read_csv("tlu_WetlndSpeciesList2.csv")
 
 glimpse(WoodySpecies_LUT)
+
+WoodySpecies_LUT <- WoodySpecies_LUT |>
+  mutate( WoodySpecies = ACRONYM) |>
+  mutate( Common_Name = COMMON_NAME) |>
+  mutate(Scientific_Name = SCIENTIFIC_NAME) |>
+  select(WoodySpecies, Scientific_Name, Common_Name)
+
+glimpse(WoodySpecies_LUT)
+
 
 Access_data <- Access_data |>
 	  left_join(WoodySpecies_LUT, join_by(WoodySpecies))
@@ -91,35 +111,27 @@ Access_data <- Access_data |>
 glimpse(Access_data)
 
 
+##########
+#
+# Step 7 - Normalize DBH columns
+#
+#   
+##########
+
 # Rename columns using DiamID values for pivot_longer
 
-Access_data$Col1 <- Access_data$Dgt40_1 
-Access_data$Col2 <- Access_data$Dgt40_2 
-Access_data$Col3 <- Access_data$Dgt40_3
-Access_data$Col4 <- Access_data$Dgt40_4 
-Access_data$Col5 <- Access_data$Dgt40_5
-
-
-glimpse(Access_data)
-
-
-# create Scientific_Name column from WoodySpecies codes
-
-WoodySpecies_LUT <- read_csv("WoodySpecies_LUT.csv")
-
-glimpse(WoodySpecies_LUT)
+Access_data$Tree1 <- Access_data$Dgt40_1 
+Access_data$Tree2 <- Access_data$Dgt40_2 
+Access_data$Tree3 <- Access_data$Dgt40_3
+Access_data$Tree4 <- Access_data$Dgt40_4 
+Access_data$Tree5 <- Access_data$Dgt40_5
 
 Access_data <- Access_data |>
-  left_join(WoodySpecies_LUT, join_by(WoodySpecies))
+  mutate( SpeciesCode = WoodySpecies) |>
+  mutate( SampleDate = EditDate) |>
+  select(EventID, LocationID, Module_No, Scientific_Name, Tree1, 
+         Tree2, Tree3, Tree4, Tree5)
 
-glimpse(Access_data)
-
-# set up columns before normalization
-
-Access_data <- Access_data |>
-	select(EventID, LocationID, FeatureID, Module_No, Scientific_Name, 
-	       EditDate, WoodySiteName, Col1, Col2, Col3, Col4, Col5,
-	       Col6, Col7, Col8, Col9, Col10, Col11, Col12)
 
 glimpse(Access_data)
 
@@ -128,13 +140,30 @@ glimpse(Access_data)
 
 Access_data <- Access_data |> 
 	  pivot_longer( 
-	           cols = starts_with("Col"),
-			       names_to = "DiamID",
-			         values_to = "Count",
+	           cols = starts_with("Tree"),
+			       names_to = "TreeName",
+			         values_to = "DBH",
 			         values_drop_na = TRUE
 			       )
 
 glimpse(Access_data)
+
+view(Access_data)
+
+
+# pivot longer (normalize)
+
+Access_data <- Access_data |> 
+  pivot_longer( 
+    cols = starts_with("Col"),
+    names_to = "DiamID",
+    values_to = "Count",
+    values_drop_na = TRUE
+  )
+
+glimpse(Access_data)
+
+
 
 
 # Join the diameter information from a LUT
