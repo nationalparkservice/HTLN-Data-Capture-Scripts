@@ -17,15 +17,21 @@ Access_data <- bind_rows(load_file1,load_file2)
 
 glimpse(Access_data)
 
-Access_data <- bind_rows(Access_data,load_file2)
+Access_data <- bind_rows(Access_data,load_file3)
 
+glimpse(Access_data)
 
 # select columns from Survey 123 and create FeatureID column
 
-Access_data <- load_file |> 
-  select(Species, Module, CoverClass, CoverClassAll, EditDate, HerbSiteName) |>
-  mutate( FeatureID = HerbSiteName) |>
-  mutate(EditDate = (EditDate <- as.Date(EditDate, format = "%m/%d/%Y")))
+Access_data <- Access_data |> 
+  select(Species, Module, CoverClass_LT_6m, CoverClassAll, EditDate, HerbSiteName, 
+         Other_species_not_on_dropdown_list) |>
+  mutate( 
+    FeatureID = HerbSiteName,
+    CoverClass = CoverClass_LT_6m,
+    Other_species = Other_species_not_on_dropdown_list,
+    EditDate = (EditDate <- as.Date(EditDate, format = "%m/%d/%Y"))
+  )
 
 glimpse(Access_data)
 
@@ -74,7 +80,7 @@ glimpse(Access_data)
 # clean up columns
 
 Access_data <- Access_data |>
-  select(EventID, FeatureID, LocationID, Species, Module,
+  select(EventID, FeatureID, LocationID, Species, Other_species, Module,
          CoverClass, CoverClassAll, EditDate, Outfile )
 
 glimpse(Access_data)
@@ -82,7 +88,7 @@ glimpse(Access_data)
 
 write_csv(Access_data, Access_data$Outfile[1])
 
-writexl::write_xlsx(Access_data, "Load_VIBI_herb.xlsx")
+writexl::write_xlsx(Access_data, "Load_VIBI_herb_2023.xlsx")
   
 
 
