@@ -5,9 +5,19 @@ library(tidyverse)
 
 # load the Survey123 data
 
-load_file <- read_csv("CUVA_VIBI_herb.csv")
+load_file1 <- read_csv("CUVA_VIBI_herb1.csv")
+load_file2 <- read_csv("CUVA_VIBI_herb2.csv")
+load_file3 <- read_csv("CUVA_VIBI_herb3.csv")
 
-glimpse(load_file)
+glimpse(load_file1)
+glimpse(load_file2)
+glimpse(load_file3)
+
+Access_data <- bind_rows(load_file1,load_file2)
+
+glimpse(Access_data)
+
+Access_data <- bind_rows(Access_data,load_file2)
 
 
 # select columns from Survey 123 and create FeatureID column
