@@ -21,6 +21,9 @@ Access_data <- bind_rows(Access_data,load_file3)
 
 glimpse(Access_data)
 
+# record count is 1731. 
+# From the spreadsheets: 304 + 280 + 1147 = 1731
+
 # select columns from Survey 123 and create FeatureID column
 
 Access_data <- Access_data |> 

@@ -4,13 +4,39 @@ library(tidyverse)
 
 #setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
 
-load_file <- read_csv("Woody.csv")
 
-glimpse(load_file)
+library(tidyverse)
+
+#setwd("./src")
+
+# load the Survey123 data
+
+load_file1 <- read_csv("CUVA_VIBI_woody1.csv")
+problems(load_file1)
+load_file2 <- read_csv("CUVA_VIBI_woody2.csv")
+problems(load_file2)
+load_file3 <- read_csv("CUVA_VIBI_woody3.csv")
+problems(load_file3)
+
+glimpse(load_file1)
+glimpse(load_file2)
+glimpse(load_file3)
+
+Access_data <- bind_rows(load_file1,load_file2)
+
+glimpse(Access_data)
+
+Access_data <- bind_rows(Access_data,load_file3)
+
+glimpse(Access_data)
+
+
+# record count is 1731. 
+# From the spreadsheets: 304 + 280 + 1147 = 1731
 
 # select columns for Access import
 
-Access_data <- load_file |>
+Access_data <- Access_data |>
 	select(WoodyModule, WoodySpecies, EditDate, WoodySiteName, ShrubClump, D0to1,
 	       D1to2_5, D2_5to5, D5to10, D10to15, D15to20, D20to25, D25to30, D30to35,
 	       D35to40, Dgt40, Dgt40_1, Dgt40_2, Dgt40_3, Dgt40_4, Dgt40_5)
@@ -62,11 +88,16 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
-# create Scientific_Name column from WoodySpecies codes
+# create Scientific_Name column from WoodySpecies codes <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#  Need to clean up the LUT in Access then re-export 
+# Check one of the later versions of Access to see if it was already fixed in
+# the database
 
 WoodySpecies_LUT <- read_csv("WoodySpecies_LUT.csv")
 
 glimpse(WoodySpecies_LUT)
+
+write_csv(Access_data, Access_data$Outfile[1]) # export to test many-to-many
 
 Access_data <- Access_data |>
   left_join(WoodySpecies_LUT, join_by(WoodySpecies))
