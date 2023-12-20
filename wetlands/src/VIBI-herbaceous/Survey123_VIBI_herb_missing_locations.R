@@ -1,3 +1,5 @@
+# This script is to detect FeatureIDs not found in the LocationID 
+# lookup table. Need to run these by Sonia...
 
 library(tidyverse)
 
@@ -67,34 +69,12 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
-# create an output file with a timestamp
-# and include it in the dataframe for reference
+#Looking for featureIDs associated with NAs in LocationID
 
-
-Access_data <- Access_data |>
-  mutate(
-    My_timestamp = now(),
-    My_timestamp = as.character(My_timestamp),
-    My_timestamp = str_replace_all(My_timestamp, " ", "_"),
-    My_timestamp = str_replace_all(My_timestamp, ":", ""),
-    Outfile = str_c("VIBI_herb_", My_timestamp,".csv")
-  ) 
-
-glimpse(Access_data)
-
-# clean up columns
-
-Access_data <- Access_data |>
-  select(EventID, FeatureID, LocationID, Species, Other_species, Module,
-         CoverClass, CoverClassAll, EditDate, Outfile )
-
-glimpse(Access_data)
-
-
-write_csv(Access_data, Access_data$Outfile[1])
-
-writexl::write_xlsx(Access_data, "Load_VIBI_herb_2023.xlsx")
-  
+Access_data |>
+  select(HerbSiteName, FeatureID, LocationID) |>
+  filter(is.na(LocationID)) |>
+  distinct(HerbSiteName)
 
 
 
