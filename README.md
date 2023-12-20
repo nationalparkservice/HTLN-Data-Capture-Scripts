@@ -4,6 +4,11 @@ Data workflows from Survey123 and other field loggers into MS Access and other r
 
 # Notes
 
+20231220
+
+Load files with NAs from left outer joins. These affect LocationIDs and
+Scientific Names. Review unique cases for herb, woody and big trees.
+
 20231011
 
 Taxon code duplicates leading to many-to-many join warning
