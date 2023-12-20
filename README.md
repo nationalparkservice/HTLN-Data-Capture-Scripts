@@ -9,8 +9,8 @@ relational databases.
 
 Wetlands VIBI...
 Load files with NAs from left outer joins. Columns affected - 
-VIBI herb: LocationID
-VIBI woody: LocationID, ScientificName, DiamID
+VIBI herb: LocationID;
+VIBI woody: LocationID, ScientificName, DiamID;
 VIBI big trees:  LocationID, ScientificName
 
 20231011
