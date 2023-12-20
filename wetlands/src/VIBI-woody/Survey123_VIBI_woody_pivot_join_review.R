@@ -1,7 +1,5 @@
 
 
-library(tidyverse)
-
 #setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
 
 
@@ -10,9 +8,32 @@ library(tidyverse)
 #setwd("./src")
 
 # load the Survey123 data
+#
+#
+# species codes were only used in CUVA_VIBI_woody1.csv
+# join to create WoodySpecies
 
 load_file1 <- read_csv("CUVA_VIBI_woody1.csv")
 problems(load_file1)
+
+WoodySpecies_LUT <- read_csv("WoodySpecies_LUT2.csv")
+
+load_file1 <- load_file1 |>
+  left_join(WoodySpecies_LUT, join_by(SpeciesCode))
+
+glimpse(load_file1)
+
+# check for NAs in WoodySpecies <<<<<<<<<<<<<<<<<<<<<< stopped here 12/20/2023
+
+
+load_file1 |>
+  select(SpeciesCode, FeatureID, LocationID) |>
+  filter(is.na(LocationID)) |>
+  distinct()
+
+
+############ load other files
+
 load_file2 <- read_csv("CUVA_VIBI_woody2.csv")
 problems(load_file2)
 load_file3 <- read_csv("CUVA_VIBI_woody3.csv")
@@ -25,6 +46,8 @@ glimpse(load_file3)
 Access_data <- bind_rows(load_file1,load_file2)
 
 glimpse(Access_data)
+
+view(Access_data)
 
 Access_data <- bind_rows(Access_data,load_file3)
 
@@ -91,21 +114,15 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# Show the WoodySiteName, FeatureID where there's no 
+# match in LocationsID
 
-# create Scientific_Name column from WoodySpecies codes 
+Access_data |>
+  select(WoodySiteName, FeatureID, LocationID) |>
+  filter(is.na(LocationID)) |>
+  distinct()
 
-WoodySpecies_LUT <- read_csv("WoodySpecies_LUT2.csv")
 
-glimpse(WoodySpecies_LUT)
-
-Access_data <- Access_data |>
-  left_join(WoodySpecies_LUT, join_by(WoodySpecies))
-
-# does the above code through many-to-many warning?? <<<<<<<<<<<<<<<<
-# see WoodySpecies_LUT cleanup script
-
-glimpse(Access_data)
 
 # set up columns before normalization
 
