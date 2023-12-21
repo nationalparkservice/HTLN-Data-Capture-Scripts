@@ -1,11 +1,10 @@
 
 
-#setwd("../HTLN-Data-Capture-Scripts/wetlands/src")
+#setwd("./wetlands/src/VIBI-woody")
 
 
 library(tidyverse)
 
-#setwd("./src")
 
 # load the Survey123 data
 #
@@ -23,12 +22,14 @@ load_file1 <- load_file1 |>
 
 glimpse(load_file1)
 
-# check for NAs in WoodySpecies <<<<<<<<<<<<<<<<<<<<<< stopped here 12/20/2023
+#view(load_file1)
+
+# check for NAs in WoodySpecies 
 
 
 load_file1 |>
-  select(SpeciesCode, FeatureID, LocationID) |>
-  filter(is.na(LocationID)) |>
+  select(SpeciesCode, WoodySpecies) |>
+  filter(is.na(WoodySpecies)) |>
   distinct()
 
 
@@ -47,7 +48,7 @@ Access_data <- bind_rows(load_file1,load_file2)
 
 glimpse(Access_data)
 
-view(Access_data)
+#view(Access_data)
 
 Access_data <- bind_rows(Access_data,load_file3)
 
@@ -127,7 +128,7 @@ Access_data |>
 # set up columns before normalization
 
 Access_data <- Access_data |>
-	select(EventID, LocationID, FeatureID, Module_No, Scientific_Name, 
+	select(EventID, LocationID, FeatureID, Module_No, WoodySpecies, 
 	       EditDate, WoodySiteName, Col1, Col2, Col3, Col4, Col5,
 	       Col6, Col7, Col8, Col9, Col10, Col11, Col12)
 
@@ -156,44 +157,14 @@ glimpse(Diam_LUT)
 Access_data <- Access_data |>
   left_join(Diam_LUT, join_by(DiamID))
 
-# Need an end-to-end test after all the column manipulations -------------------
-# Sum of counts in initial load file
-
-
-Initial_load <- load_file |>
-  select(ShrubClump, D0to1,
-         D1to2_5, D2_5to5, D5to10, D10to15, D15to20, D20to25, D25to30, D30to35,
-         D35to40, Dgt40)
-
-
-
-colSums(Initial_load, na.rm=TRUE)
-
+# Show the WoodySiteName, FeatureID where there's no 
+# match in LocationsID
 
 Access_data |>
-  group_by(Diam_Desc) |> 
-  summarize(
-    total_count = sum(Count)
-  )
+  select(DiamID, Diam_Code, Diam_Desc) |>
+  filter(is.na(Diam_Code)) |>
+  distinct()
 
-# Passed this test
-
-#-------------------------------------------------------------------------------
-
-# Substitute NA with -9999 in Count data 
-  
-glimpse(Access_data)
-
-Access_data$Count <- Access_data$Count |> replace_na(-9999)
-
-
-
-Access_data <- Access_data |>
-  select( EventID, LocationID, FeatureID, Module_No, 
-          Scientific_Name, Diam_Code, Count
-  )
-
-glimpse(Access_data)
 view(Access_data)
 
-writexl::write_xlsx(Access_data, "Load_VIBI_woody.xlsx")
+
