@@ -1,7 +1,7 @@
 
 library(tidyverse)
 
-setwd("./wetlands/src/VIBI-herbaceous")
+# setwd("./wetlands/src/VIBI-herbaceous")
 
 # load the Survey123 data
 
@@ -13,6 +13,41 @@ glimpse(load_file1)
 glimpse(load_file2)
 glimpse(load_file3)
 
+load_file1 <- load_file1 |> 
+  mutate(
+    SpeciesComments = Other_species_not_on_dropdown_list
+  ) |>
+  select(
+    Species, SpeciesComments, Module, 
+    CoverClass_LT_6m, CoverClassAll,
+    EditDate, HerbSiteName
+  )
+
+load_file2 <- load_file2 |>
+  mutate(
+    SpeciesComments = Other_species_not_on_dropdown_list
+  ) |>
+  select(
+    Species, SpeciesComments, Module, 
+    CoverClass_LT_6m, CoverClassAll,
+    EditDate, HerbSiteName
+  )
+
+load_file3 <- load_file3 |>
+  mutate(
+    SpeciesComments = Other_species_not_on_dropdown_list
+  ) |>
+  select(
+    Species, SpeciesComments, Module, 
+    CoverClass_LT_6m, CoverClassAll,
+    EditDate, HerbSiteName
+  )
+
+glimpse(load_file1)
+glimpse(load_file2)
+glimpse(load_file3)
+
+
 Access_data <- bind_rows(load_file1,load_file2)
 
 glimpse(Access_data)
@@ -21,18 +56,15 @@ Access_data <- bind_rows(Access_data,load_file3)
 
 glimpse(Access_data)
 
-# record count is 1731. 
-# From the spreadsheets: 304 + 280 + 1147 = 1731
+1017 + 1281 + 1780
 
-# select columns from Survey 123 and create FeatureID column
 
-Access_data <- Access_data |> 
-  select(Species, Module, CoverClass_LT_6m, CoverClassAll, EditDate, HerbSiteName, 
-         Other_species_not_on_dropdown_list) |>
+# Create some column names and fix dates
+
+Access_data <- Access_data |>
   mutate( 
     FeatureID = HerbSiteName,
     CoverClass = CoverClass_LT_6m,
-    Other_species = Other_species_not_on_dropdown_list,
     EditDate = (EditDate <- as.Date(EditDate, format = "%m/%d/%Y"))
   )
 
@@ -61,7 +93,7 @@ glimpse(Access_data)
 
 
 
-Locations_LUT <- read_csv("Locations_LUT.csv")
+Locations_LUT <- read_csv("tbl_Locations_20230316.csv")
 
 glimpse(Locations_LUT)
 

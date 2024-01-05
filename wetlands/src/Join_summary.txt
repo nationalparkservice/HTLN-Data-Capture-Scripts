@@ -2,6 +2,9 @@
 Join_summary.txt
 ----------------
 
+see Sonia's email from 12/27 for updates to FeatureIDs
+need to make these updates to the HTLNWetlands db
+
 VIBI_herbaceous
 
   HerbSiteName FeatureID LocationID
