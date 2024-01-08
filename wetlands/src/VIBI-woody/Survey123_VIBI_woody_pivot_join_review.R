@@ -22,7 +22,7 @@ load_file1 <- load_file1 |>
 
 glimpse(load_file1)
 
-#view(load_file1)
+# view(load_file1)
 
 # check for NAs in WoodySpecies 
 
@@ -58,7 +58,7 @@ glimpse(Access_data)
 
 
 # record count is 1731. 
-# From the spreadsheets: 304 + 280 + 1147 = 1731
+# From the spreadsheets: 303 + 280 + 1147 = 1731
 
 # select columns for Access import
 
