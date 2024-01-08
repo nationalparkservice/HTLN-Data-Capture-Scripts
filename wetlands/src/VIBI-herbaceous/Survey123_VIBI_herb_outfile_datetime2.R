@@ -27,12 +27,11 @@ glimpse(Access_data)
 # select columns from Survey 123 and create FeatureID column
 
 Access_data <- Access_data |> 
-  select(Species, Module, CoverClass_LT_6m, CoverClassAll, EditDate, HerbSiteName, 
-         Other_species_not_on_dropdown_list) |>
+  select(Species, SpeciesComments, Module, CoverClass_LT_6m, 
+         CoverClassAll, EditDate, HerbSiteName) |>
   mutate( 
     FeatureID = HerbSiteName,
     CoverClass = CoverClass_LT_6m,
-    Other_species = Other_species_not_on_dropdown_list,
     EditDate = (EditDate <- as.Date(EditDate, format = "%m/%d/%Y"))
   )
 
@@ -58,7 +57,7 @@ glimpse(Access_data)
 # ERROR - FeatureIDs not joining 
 
 
-Locations_LUT <- read_csv("Locations_LUT.csv")
+Locations_LUT <- read_csv("tbl_Locations_20230316.csv")
 
 glimpse(Locations_LUT)
 
@@ -85,7 +84,7 @@ glimpse(Access_data)
 # clean up columns
 
 Access_data <- Access_data |>
-  select(EventID, FeatureID, LocationID, Species, Other_species, Module,
+  select(EventID, FeatureID, LocationID, Species, SpeciesComments, Module,
          CoverClass, CoverClassAll, EditDate, Outfile )
 
 glimpse(Access_data)
