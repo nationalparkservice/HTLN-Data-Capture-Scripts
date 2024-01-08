@@ -14,9 +14,6 @@ glimpse(load_file2)
 glimpse(load_file3)
 
 load_file1 <- load_file1 |> 
-  mutate(
-    SpeciesComments = Other_species_not_on_dropdown_list
-  ) |>
   select(
     Species, SpeciesComments, Module, 
     CoverClass_LT_6m, CoverClassAll,
@@ -24,9 +21,6 @@ load_file1 <- load_file1 |>
   )
 
 load_file2 <- load_file2 |>
-  mutate(
-    SpeciesComments = Other_species_not_on_dropdown_list
-  ) |>
   select(
     Species, SpeciesComments, Module, 
     CoverClass_LT_6m, CoverClassAll,
@@ -34,9 +28,6 @@ load_file2 <- load_file2 |>
   )
 
 load_file3 <- load_file3 |>
-  mutate(
-    SpeciesComments = Other_species_not_on_dropdown_list
-  ) |>
   select(
     Species, SpeciesComments, Module, 
     CoverClass_LT_6m, CoverClassAll,
@@ -56,10 +47,12 @@ Access_data <- bind_rows(Access_data,load_file3)
 
 glimpse(Access_data)
 
+view(Access_data)
+
 1017 + 1281 + 1780
 
 
-# Create some column names and fix dates
+# Create some column names and fix date
 
 Access_data <- Access_data |>
   mutate( 
@@ -85,22 +78,45 @@ Access_data <- Access_data |>
 
 glimpse(Access_data)
 
+# view(Access_data)
+
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 # create the LocationID column from the FeatureID column
 # and a lookup table from HTLNWetlands
 
+# many-to-many with left_join
+# is FeatureID unique with Locations_LUT
 
 
 Locations_LUT <- read_csv("tbl_Locations_20230316.csv")
 
 glimpse(Locations_LUT)
 
+# view(Locations_LUT)
+
+
+duplicates <- Locations_LUT |> 
+  group_by(FeatureID) |> 
+  summarize(
+    n = n()
+  ) |> 
+  filter( n > 1) 
+
+# view(duplicates)
+
+# view(Locations_LUT)
+
+# view(Access_data)
+
+
 Access_data <- Access_data |>
   left_join(Locations_LUT, join_by(FeatureID))
 
 glimpse(Access_data)
+
+# view(Access_data)
 
 # Show the HerbSiteName, FeatureID where there's no 
 # match in LocationsID
