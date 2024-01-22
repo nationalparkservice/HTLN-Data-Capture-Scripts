@@ -1,5 +1,5 @@
 
-# setwd("../VIBI-BigTrees")
+#setwd("./HTLN-Data-Capture-Scripts/wetlands/src/VIBI-BigTrees")
 
 
 
@@ -27,7 +27,9 @@ load_file1 <- load_file1 |>
 
 glimpse(load_file1)
 
-#view(load_file1)
+view(load_file1)
+
+##view(load_file1)
 
 # check for NAs in WoodySpecies 
 
@@ -41,8 +43,12 @@ load_file1 |>
 load_file2 <- read_csv("CUVA_VIBI_woody2.csv")
 problems(load_file2)
 
+view(load_file2)
+
 load_file3 <- read_csv("CUVA_VIBI_woody3.csv")
 problems(load_file3)
+
+view(load_file3)
 
 glimpse(load_file1)
 glimpse(load_file2)
@@ -58,7 +64,7 @@ load_file <- Access_data
 
 glimpse(Access_data)
 
-view(Access_data)
+#view(Access_data)
 
 ##########
 #
@@ -111,7 +117,7 @@ glimpse(Access_data)
 ##########
 
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-Locations_LUT <- read_csv("Locations_LUT.csv")
+Locations_LUT <- read_csv("tbl_Locations_20230316.csv")
 
 glimpse(Locations_LUT)
 
@@ -128,5 +134,5 @@ Access_data |>
   filter(is.na(LocationID)) |>
   distinct()
 
-
+view(Access_data)
 
